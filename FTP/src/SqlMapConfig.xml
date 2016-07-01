@@ -22,6 +22,7 @@
 		<!-- 指定映射器路径 -->
 	<mappers>
 		<mapper resource="com/ftpService/dao/mapper/ftpUserMapper.xml"/>
+		<mapper resource="com/ftpService/dao/mapper/userInfoMapper.xml"/>
 	</mappers>
 	 
 </configuration> 

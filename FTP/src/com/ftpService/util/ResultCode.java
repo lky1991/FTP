@@ -26,6 +26,8 @@ public class ResultCode {
 	public static Integer USERNAME_EMPTY=10009;//用户名为空
 	public static Integer DIRCTORY_EXIST=10010;//目录已存在
 	public static Integer lIMITED_PERMISSION=10011;//权限受限
+	public static Integer ILLEGAL_NUMBER=10012;//非法数字
+
 	
 	
 	
@@ -50,7 +52,7 @@ public class ResultCode {
 			case 10009:errmsg="username is empty";break;
 			case 10010:errmsg="directory exists";break;
 			case 10011:errmsg="insufficient privilege";break;
-			
+			case 10012:errmsg="illegal number";break;
 		
 		}
 

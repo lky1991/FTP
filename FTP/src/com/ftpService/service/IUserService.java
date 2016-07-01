@@ -10,7 +10,7 @@ public interface IUserService {
 	* @param  homedirectory 用户的主目录
 	* @return String    返回类型
 	*/
-	public String addUser(String company, String department,String application, String username,String homedirectory);
+	public String addUser(String company, String department,String application, String username,String homedirectory,String  expire);
 	
 	
 	

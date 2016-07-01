@@ -2,6 +2,8 @@ package com.ftpService.service.impl;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,7 +15,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ftpService.dao.ftpUserMapper;
+import com.ftpService.dao.userInfoMapper;
 import com.ftpService.model.ftpUser;
+import com.ftpService.model.userInfo;
 import com.ftpService.service.IUserService;
 import com.ftpService.util.RandomCode;
 import com.ftpService.util.ReadConfigUtil;
@@ -31,6 +35,9 @@ public class userService implements IUserService {
 	@Autowired
 	private ftpUserMapper ftpMapper;
 
+	@Autowired
+	private userInfoMapper infoMapper;
+	
 	private ResultJson resultJson = new ResultJson();// 用于创建返回前端的结果
 
 	/**
@@ -41,7 +48,7 @@ public class userService implements IUserService {
 	 * @param homedirectory 用户的主目录
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public String addUser(String company, String department, String application, String username, String homedirectory) {
+	public String addUser(String company, String department, String application, String username, String homedirectory,String expire) {
 		JSONObject result = new JSONObject();
 
 		try {
@@ -57,42 +64,59 @@ public class userService implements IUserService {
 				result = resultJson.createResultJSON(ResultCode.USERNAME_EMPTY);
 			} else if (homedirectory.isEmpty()) {
 				result = resultJson.createResultJSON(ResultCode.HOMRDIRCTORY_EMPTY);
-			} else {
+			}else if(!isNumeric(expire)){
+				result=resultJson.createResultJSON(ResultCode.ILLEGAL_NUMBER);
+			}
+			else {
 				String objectPath = basePath + File.separator + company + File.separator + department + File.separator + application + File.separator + username;
-
+				
 				if (null == ftpMapper.selectByHomeDirectory(objectPath)) {
 					result = resultJson.createResultJSON(ResultCode.lIMITED_PERMISSION);
 				} else {
-					ftpUser fUser = ftpMapper.selectByHomeDirectory(objectPath+File.separator+homedirectory);
-					if (null == fUser) {
-						fileUtil.createDirectory(objectPath+File.separator+homedirectory);// 创建目录
-
-						String account = RandomCode.getFtpAccount();// 创建ftp账号
-						while (null != ftpMapper.selectByPrimaryKey(account)) {
-							account = RandomCode.getFtpAccount();
-						}
-
-						fUser = new ftpUser();
-						fUser.setUserid(account);
-						fUser.setUserpassword(RandomCode.getFtpPassword());
-						fUser.setHomedirectory(objectPath+File.separator+homedirectory);
-						fUser.setEnableflag(true);
-						fUser.setWritepermission(false);
-						fUser.setIdletime(0);
-						fUser.setUploadrate(0);
-						fUser.setDownloadrate(0);
-						fUser.setMaxloginnumber(10);
-						fUser.setMaxloginperip(10);
-
-						ftpMapper.insert(fUser);
-					}
+					fileUtil.createDirectory(objectPath + File.separator + homedirectory);// 创建目录
 					
+					ftpUser fUser = new ftpUser();
+					String account = RandomCode.getFtpAccount();// 创建ftp账号
+					while (null != ftpMapper.selectByPrimaryKey(account)) {
+						account = RandomCode.getFtpAccount();
+					}
+
+					fUser.setUserid(account);
+					fUser.setUserpassword(RandomCode.getFtpPassword());
+					fUser.setHomedirectory(objectPath + File.separator + homedirectory);
+					fUser.setEnableflag(true);
+					fUser.setWritepermission(false);
+					fUser.setIdletime(0);
+					fUser.setUploadrate(0);
+					fUser.setDownloadrate(0);
+					fUser.setMaxloginnumber(10);
+					fUser.setMaxloginperip(10);
+
+					userInfo uInfo = new userInfo();
+					if (expire.trim().isEmpty()) {
+						uInfo.setExpire(7);// 默认有效期
+					} else {
+						uInfo.setExpire(Integer.valueOf(expire));
+					}
+					uInfo.setFtpAccount(account);
+
+					ftpMapper.insert(fUser);
+					infoMapper.insert(uInfo);
+
+					String internal_ip = readConfig.getValue("ftp.internal.ip");// 内网ip
+					String external_ip = readConfig.getValue("ftp.external.ip");// 外网ip
+					String ip = null;
+					if (internal_ip.trim().isEmpty()) {
+						ip = external_ip;
+					} else {
+						ip = internal_ip;
+					}
+
 					result = resultJson.createResultJSON(ResultCode.SUCCESS);
 					result.put("account", fUser.getUserid());
 					result.put("password", fUser.getUserpassword());
-					result.put("ip", readConfig.getValue("ftp.internal.ip"));
+					result.put("ip", ip);
 					result.put("port", readConfig.getValue("ftp.port"));
-					
 				}
 			}
 
@@ -135,6 +159,7 @@ public class userService implements IUserService {
 						result = resultJson.createResultJSON(ResultCode.USERID_NO_EXIST);
 					} else {
 						ftpMapper.deleteByPrimaryKey(userid);
+						infoMapper.deleteByPrimaryKey(userid);
 						result = resultJson.createResultJSON(ResultCode.SUCCESS);
 					}
 				}
@@ -176,7 +201,6 @@ public class userService implements IUserService {
 				result = resultJson.createResultJSON(ResultCode.USERNAME_EMPTY);
 			} else {
 				String objectPath = basePath + File.separator + company + File.separator + department + File.separator + application + File.separator + username;
-
 				if (!fileUtil.createDirectory(objectPath)) {
 					result = resultJson.createResultJSON(ResultCode.DIRCTORY_EXIST);
 				} else {
@@ -200,11 +224,22 @@ public class userService implements IUserService {
 					fUser.setMaxloginperip(10);
 
 					ftpMapper.insert(fUser);
+					
+					
+					String internal_ip = readConfig.getValue("ftp.internal.ip");// 内网ip
+					String external_ip = readConfig.getValue("ftp.external.ip");// 外网ip
+					String ip = null;
+					if (internal_ip.trim().isEmpty()) {
+						ip = external_ip;
+					} else {
+						ip = internal_ip;
+					}
 
+					
 					result = resultJson.createResultJSON(ResultCode.SUCCESS);
 					result.put("account", account);
 					result.put("password", password);
-					result.put("ip", readConfig.getValue("ftp.internal.ip"));
+					result.put("ip", ip);
 					result.put("port", readConfig.getValue("ftp.port"));
 				}
 			}
@@ -283,5 +318,20 @@ public class userService implements IUserService {
 			result = resultJson.createResultJSON(ResultCode.UNKNOWERROR);
 			return result.toString();
 		}
+	}
+	
+	/**
+	* @Description: 判断字符串中是否有非数字的字符
+	* @param str
+	* @return boolean    返回类型
+	 */
+	private  boolean isNumeric(String str) {
+		str = str.trim();
+		Pattern pattern = Pattern.compile("[0-9]*");
+		Matcher isNum = pattern.matcher(str);
+		if (!isNum.matches()) {
+			return false;
+		}
+		return true;
 	}
 }

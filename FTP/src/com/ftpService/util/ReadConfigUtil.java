@@ -90,6 +90,6 @@ public class ReadConfigUtil {
 
     public static void main(String args[]) {
         System.out.println(new ReadConfigUtil("ftp.properties", true).getValue("ftp.internal.ip"));
-        System.out.println(new ReadConfigUtil("ftp.properties", true).getValue("ftp.port"));
+        System.out.println(new ReadConfigUtil("ftp.properties", true).getValue("ftp.external.ip"));
     }
 }

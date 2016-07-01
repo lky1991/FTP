@@ -1,37 +1,19 @@
 package com.ftpService.model;
 
+import java.util.Date;
+
 /**
-* @ClassName: userInfo  
-* @Description: 用户的基本信息(开发者用户和临时用户)
+* @ClassName: 临时ftp用户的基本信息
+* @Description: TODO(这里用一句话描述这个类的作用)  
 * @author wally@hudongpai.com
-* @date 2016-6-27 下午04:12:18
+* @date 2016-6-30 上午11:17:00
  */
 public class userInfo {
-    private Integer uid; 
+    private String ftpAccount;
 
-    private String token;  //开发者用户的token
+    private Date registorTime;
 
-    private String ftpAccount; //用户的ftp账号
-
-    private Boolean type; //用户类型
-
-    private String expire; //token 创建时间
-
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token == null ? null : token.trim();
-    }
+    private Integer expire;
 
     public String getFtpAccount() {
         return ftpAccount;
@@ -41,26 +23,25 @@ public class userInfo {
         this.ftpAccount = ftpAccount == null ? null : ftpAccount.trim();
     }
 
-    public Boolean getType() {
-        return type;
+    public Date getRegistorTime() {
+        return registorTime;
     }
 
-    public void setType(Boolean type) {
-        this.type = type;
+    public void setRegistorTime(Date registorTime) {
+        this.registorTime = registorTime;
     }
 
-    public String getExpire() {
+    public Integer getExpire() {
         return expire;
     }
 
-    public void setExpire(String expire) {
-        this.expire = expire == null ? null : expire.trim();
+    public void setExpire(Integer expire) {
+        this.expire = expire;
     }
 
 	@Override
 	public String toString() {
-		return "userInfo [uid=" + uid + ", token=" + token + ", ftpAccount="
-				+ ftpAccount + ", type=" + type + ", expire=" + expire + "]";
+		return "userInfo [ftpAccount=" + ftpAccount + ", registorTime=" + registorTime + ", expire=" + expire + "]";
 	}
     
 }

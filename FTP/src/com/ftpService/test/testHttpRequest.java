@@ -9,8 +9,6 @@ import org.junit.Test;
 import com.ftpService.util.HttpRequest;
 
 public class testHttpRequest {
-	
-	
 	/**
 	* @Description: 测试（目录创建）
 	 */
@@ -18,10 +16,10 @@ public class testHttpRequest {
 	@Ignore
 	public void testCreateDirectory() {
 		Map<String, String> param = new HashMap<String, String>();
-		param.put("company", "互动派");
+		param.put("company", "省移动");
 		param.put("department", "数据业务部");
-		param.put("application", "华为项目");
-		param.put("username", "小赵");
+		param.put("application", "能力开放平台项目");
+		param.put("username", "小李");
 		
 		System.out.println(HttpRequest.sendPost(" http://vm1:8081/FTP/user/adddeveloper.do", param));
 	}
@@ -45,8 +43,8 @@ public class testHttpRequest {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("company", "互动派");
 		param.put("department", "数据业务部");
-		param.put("application", "华为项目");
-		param.put("username", "小赵");
+		param.put("application", "电信项目");
+		param.put("username", "小王");
 		
 		System.out.println(HttpRequest.sendPost(" http://vm1:8081/FTP/user/searchdirectory.do", param));
 	}
@@ -56,14 +54,14 @@ public class testHttpRequest {
 	* @Description: 测试(添加临时ftp用户)
 	 */
 	@Test
-	@Ignore
 	public void testAddFtpUser(){
 		Map<String, String> param = new HashMap<String, String>();
-		param.put("company", "互动派");
+		param.put("company", "省移动");
 		param.put("department", "数据业务部");
-		param.put("application", "华为项目");
-		param.put("username", "小赵");
-		param.put("homedirectory","yz");
+		param.put("application", "能力开放平台项目");
+		param.put("username", "小李");
+		param.put("homedirectory","ddd");
+		param.put("expire", "");
 		
 		System.out.println(HttpRequest.sendPost(" http://vm1:8081/FTP/user/adduser.do", param));
 	}
@@ -73,6 +71,7 @@ public class testHttpRequest {
 	* @Description: 测试（删除临时的ftp用户）
 	*/
 	@Test
+	@Ignore
 	public void testDeleteFtpUser(){
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("company", "互动派");

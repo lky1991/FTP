@@ -17,8 +17,8 @@ public class UserController {
 	
 	//添加ftp临时用户
 	@RequestMapping(value = "adduser.do", produces = "text/json;charset=UTF-8", method = { RequestMethod.GET, RequestMethod.POST })
-	public @ResponseBody String addUser(String company, String department,String application, String username,String homedirectory) {
-		return uService.addUser(company, department, application, username, homedirectory);
+	public @ResponseBody String addUser(String company, String department,String application, String username,String homedirectory,String expire) {
+		return uService.addUser(company, department, application, username, homedirectory, expire);
 	}
 
 	//删除ftp临时用户
